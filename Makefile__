@@ -1,0 +1,304 @@
+CLIENTBIN=ioquake3#定义客户端主程序名
+
+BUILD_CLIENT=1#定义编译客户端程序
+
+ARCH=x86_64
+BINEXT=.exe
+
+#文件名，包括架构和后缀名,最终是ioquake3.x86_64.exe
+ifndef FULLBINEXT
+  FULLBINEXT=.$(ARCH)$(BINEXT)
+endif
+
+#定义需要生成的目标为空
+TARGETS =
+
+#编译平台，在win上用mingw32编译
+PLATFORM=mingw32
+
+#编译文件在build文件夹中
+ifndef BUILD_DIR
+BUILD_DIR=build
+endif
+
+#debug版本的编译目录
+BD=$(BUILD_DIR)/debug-$(PLATFORM)-$(ARCH)
+
+#编译客户端
+ifneq ($(BUILD_CLIENT),0)
+	TARGETS += $(B)/$(CLIENTBIN)$(FULLBINEXT)
+endif
+
+#目录
+ifndef MOUNT_DIR
+MOUNT_DIR=code
+endif
+
+SYSDIR=$(MOUNT_DIR)/sys
+
+#定义编译用的指令，生成.o文件
+define DO_CC
+$(echo_cmd) "CC $<"
+$(Q)$(CC) $(NOTSHLIBCFLAGS) $(CFLAGS) $(CLIENT_CFLAGS) $(OPTIMIZE) -o $@ -c $<
+endef
+
+B=$(BD)
+
+MKDIR=mkdir -p
+
+
+export PATH := /usr/bin:$(PATH)
+
+
+default: debug
+all: debug release
+
+#第一次make默认编译debug版本
+#在make中又调用了make，这次make传入了具体的make参数
+#调用的是targets目标，这个目标在下面定义
+debug:
+	@echo "PATH1 is $(PATH)"
+	@$(MAKE) targets  B=$(BD) CFLAGS="$(CFLAGS) $(BASE_CFLAGS) $(DEPEND_CFLAGS)" \
+	  OPTIMIZE="$(DEBUG_CFLAGS)" OPTIMIZEVM="$(DEBUG_CFLAGS)" \
+	  CLIENT_CFLAGS="$(CLIENT_CFLAGS)" SERVER_CFLAGS="$(SERVER_CFLAGS)" V=$(V) \
+	  LDFLAGS="$(LDFLAGS) $(DEBUG_LDFLAGS)"
+
+
+
+#第二次make会调用的目标
+targets: makedirs
+	@echo ""
+	@echo "Building in $(B):"
+	@echo "  PLATFORM: $(PLATFORM)"
+	@echo "  ARCH: $(ARCH)"
+	@echo "  VERSION: $(VERSION)"
+	@echo "  COMPILE_PLATFORM: $(COMPILE_PLATFORM)"
+	@echo "  COMPILE_ARCH: $(COMPILE_ARCH)"
+	@echo "  HAVE_VM_COMPILED: $(HAVE_VM_COMPILED)"
+	@echo "  PKG_CONFIG: $(PKG_CONFIG)"
+	@echo "  CC: $(CC)"
+	ifneq ($(TARGETS),)
+  		ifndef DEBUG_MAKEFILE
+			@$(MAKE) $(TARGETS) $(B).zip V=$(V)
+  		endif
+	endif
+
+
+
+#定义客户端需要的obj文件
+Q3OBJ = \
+  $(B)/client/cl_cgame.o \
+  $(B)/client/cl_cin.o \
+  $(B)/client/cl_console.o \
+  $(B)/client/cl_input.o \
+  $(B)/client/cl_keys.o \
+  $(B)/client/cl_main.o \
+  $(B)/client/cl_net_chan.o \
+  $(B)/client/cl_parse.o \
+  $(B)/client/cl_scrn.o \
+  $(B)/client/cl_ui.o \
+  $(B)/client/cl_avi.o \
+  \
+  $(B)/client/cm_load.o \
+  $(B)/client/cm_patch.o \
+  $(B)/client/cm_polylib.o \
+  $(B)/client/cm_test.o \
+  $(B)/client/cm_trace.o \
+  \
+  $(B)/client/cmd.o \
+  $(B)/client/common.o \
+  $(B)/client/cvar.o \
+  $(B)/client/files.o \
+  $(B)/client/md4.o \
+  $(B)/client/md5.o \
+  $(B)/client/msg.o \
+  $(B)/client/net_chan.o \
+  $(B)/client/net_ip.o \
+  $(B)/client/huffman.o \
+  \
+  $(B)/client/snd_altivec.o \
+  $(B)/client/snd_adpcm.o \
+  $(B)/client/snd_dma.o \
+  $(B)/client/snd_mem.o \
+  $(B)/client/snd_mix.o \
+  $(B)/client/snd_wavelet.o \
+  \
+  $(B)/client/snd_main.o \
+  $(B)/client/snd_codec.o \
+  $(B)/client/snd_codec_wav.o \
+  $(B)/client/snd_codec_ogg.o \
+  $(B)/client/snd_codec_opus.o \
+  \
+  $(B)/client/qal.o \
+  $(B)/client/snd_openal.o \
+  \
+  $(B)/client/cl_curl.o \
+  \
+  $(B)/client/sv_bot.o \
+  $(B)/client/sv_ccmds.o \
+  $(B)/client/sv_client.o \
+  $(B)/client/sv_game.o \
+  $(B)/client/sv_init.o \
+  $(B)/client/sv_main.o \
+  $(B)/client/sv_net_chan.o \
+  $(B)/client/sv_snapshot.o \
+  $(B)/client/sv_world.o \
+  \
+  $(B)/client/q_math.o \
+  $(B)/client/q_shared.o \
+  \
+  $(B)/client/unzip.o \
+  $(B)/client/ioapi.o \
+  $(B)/client/puff.o \
+  $(B)/client/vm.o \
+  $(B)/client/vm_interpreted.o \
+  \
+  $(B)/client/be_aas_bspq3.o \
+  $(B)/client/be_aas_cluster.o \
+  $(B)/client/be_aas_debug.o \
+  $(B)/client/be_aas_entity.o \
+  $(B)/client/be_aas_file.o \
+  $(B)/client/be_aas_main.o \
+  $(B)/client/be_aas_move.o \
+  $(B)/client/be_aas_optimize.o \
+  $(B)/client/be_aas_reach.o \
+  $(B)/client/be_aas_route.o \
+  $(B)/client/be_aas_routealt.o \
+  $(B)/client/be_aas_sample.o \
+  $(B)/client/be_ai_char.o \
+  $(B)/client/be_ai_chat.o \
+  $(B)/client/be_ai_gen.o \
+  $(B)/client/be_ai_goal.o \
+  $(B)/client/be_ai_move.o \
+  $(B)/client/be_ai_weap.o \
+  $(B)/client/be_ai_weight.o \
+  $(B)/client/be_ea.o \
+  $(B)/client/be_interface.o \
+  $(B)/client/l_crc.o \
+  $(B)/client/l_libvar.o \
+  $(B)/client/l_log.o \
+  $(B)/client/l_memory.o \
+  $(B)/client/l_precomp.o \
+  $(B)/client/l_script.o \
+  $(B)/client/l_struct.o \
+  \
+  $(B)/client/sdl_input.o \
+  $(B)/client/sdl_snd.o \
+  \
+  $(B)/client/con_log.o \
+  $(B)/client/sys_autoupdater.o \
+  $(B)/client/sys_main.o
+
+  #还需要的一些.o文件
+
+#将Q3OBJ文件链接起来生成客户端ioquake3.x86_64.exe
+$(B)/$(CLIENTBIN)$(FULLBINEXT): $(Q3OBJ) $(LIBSDLMAIN)
+	$(echo_cmd) "LD $@"
+	$(Q)$(CC) $(CLIENT_CFLAGS) $(CFLAGS) $(CLIENT_LDFLAGS) $(LDFLAGS) $(NOTSHLIBLDFLAGS) \
+		-o $@ $(Q3OBJ) \
+		$(LIBSDLMAIN) $(CLIENT_LIBS) $(LIBS)
+
+#具体的编译，将点c文件编译为点o文件
+$(B)/client/%.o: $(ASMDIR)/%.s
+	$(DO_AS)
+
+# k8 so inline assembler knows about SSE
+$(B)/client/%.o: $(ASMDIR)/%.c
+	$(DO_CC) -march=k8
+
+$(B)/client/snd_altivec.o: $(CDIR)/snd_altivec.c
+	$(DO_CC_ALTIVEC)
+
+$(B)/client/%.o: $(CDIR)/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(SDIR)/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(CMDIR)/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(BLIBDIR)/%.c
+	$(DO_BOT_CC)
+
+$(B)/client/%.o: $(OGGDIR)/src/%.c
+	$(DO_CC)
+
+$(B)/client/vorbis/%.o: $(VORBISDIR)/lib/%.c
+	$(DO_CC)
+
+$(B)/client/opus/%.o: $(OPUSDIR)/src/%.c
+	$(DO_CC)
+
+$(B)/client/opus/%.o: $(OPUSDIR)/celt/%.c
+	$(DO_CC)
+
+$(B)/client/opus/%.o: $(OPUSDIR)/silk/%.c
+	$(DO_CC)
+
+$(B)/client/opus/%.o: $(OPUSDIR)/silk/float/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(OPUSFILEDIR)/src/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(ZDIR)/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(SDLDIR)/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(SYSDIR)/%.c
+	$(DO_CC)
+
+$(B)/client/%.o: $(SYSDIR)/%.m
+	$(DO_CC)
+
+$(B)/client/win_resource.o: $(SYSDIR)/win_resource.rc $(SYSDIR)/win_manifest.xml
+	$(DO_WINDRES)
+
+#编译之前先创建必要的目录
+makedirs:
+	@echo "PATH2 is $(PATH)"
+	@$(MKDIR) $(B)/autoupdater
+	@$(MKDIR) $(B)/client/opus
+	@$(MKDIR) $(B)/client/vorbis
+	@$(MKDIR) $(B)/renderergl1
+	@$(MKDIR) $(B)/renderergl2
+	@$(MKDIR) $(B)/renderergl2/glsl
+	@$(MKDIR) $(B)/ded
+	@$(MKDIR) $(B)/$(BASEGAME)/cgame
+	@$(MKDIR) $(B)/$(BASEGAME)/game
+	@$(MKDIR) $(B)/$(BASEGAME)/ui
+	@$(MKDIR) $(B)/$(BASEGAME)/qcommon
+	@$(MKDIR) $(B)/$(BASEGAME)/vm
+	@$(MKDIR) $(B)/$(MISSIONPACK)/cgame
+	@$(MKDIR) $(B)/$(MISSIONPACK)/game
+	@$(MKDIR) $(B)/$(MISSIONPACK)/ui
+	@$(MKDIR) $(B)/$(MISSIONPACK)/qcommon
+	@$(MKDIR) $(B)/$(MISSIONPACK)/vm
+	@$(MKDIR) $(B)/tools/asm
+	@$(MKDIR) $(B)/tools/etc
+	@$(MKDIR) $(B)/tools/rcc
+	@$(MKDIR) $(B)/tools/cpp
+	@$(MKDIR) $(B)/tools/lburg
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

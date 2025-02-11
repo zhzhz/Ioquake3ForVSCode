@@ -1,0 +1,69 @@
+$ make
+make[1]: Entering directory '/cygdrive/d/prj/ioq3-main'
+
+Building in build/debug-mingw32-x86_64:
+  PLATFORM: mingw32
+  ARCH: x86_64
+  VERSION: 1.36
+  COMPILE_PLATFORM: cygwin
+  COMPILE_ARCH: x86_64
+  HAVE_VM_COMPILED: true
+  PKG_CONFIG: unknown-pkg-config
+  CC: /usr/bin/x86_64-w64-mingw32-gcc
+  WINDRES: /usr/bin/x86_64-w64-mingw32-windres
+
+  CFLAGS:
+    -Wall -fno-strict-aliasing -Wimplicit -Wstrict-prototypes -DUSE_ICON
+    -DWINVER=0x501 -m64 -DNO_GZIP -Icode/zlib -DUSE_INTERNAL_JPEG
+    -Icode/jpeg-8c -DUSE_LOCAL_HEADERS -DPRODUCT_VERSION="1.36" -Wformat=2
+    -Wno-format-zero-length -Wformat-security -Wno-format-nonliteral
+    -Wstrict-aliasing=2 -Wmissing-format-attribute -Wdisabled-optimization
+    -Werror-implicit-function-declaration -MMD -ggdb -O0
+
+  CLIENT_CFLAGS:
+    -DCURL_STATICLIB -Icode/SDL2/include -DUSE_OPENAL
+    -DUSE_OPENAL_DLOPEN -DUSE_CURL -DUSE_VOIP -DUSE_CODEC_OPUS
+    -DOPUS_BUILD -DHAVE_LRINTF -DFLOATING_POINT -DFLOAT_APPROX -DUSE_ALLOCA
+    -Icode/opus-1.2.1/include -Icode/opus-1.2.1/celt -Icode/opus-1.2.1/silk
+    -Icode/opus-1.2.1/silk/float -Icode/opusfile-0.9/include -DUSE_CODEC_VORBIS
+    -Icode/libvorbis-1.3.6/include -Icode/libvorbis-1.3.6/lib
+    -Icode/libogg-1.3.3/include -DUSE_RENDERER_DLOPEN -DUSE_MUMBLE
+
+  SERVER_CFLAGS:
+    -DUSE_VOIP
+
+  TOOLS_CFLAGS:
+    -g -Wall -fno-strict-aliasing -DTEMPDIR="/tmp" -DSYSTEM=""
+    -Icode/tools/lcc/src -Icode/tools/lcc/lburg -MMD
+
+  LDFLAGS:
+
+
+  LIBS:
+    -lws2_32 -lwinmm -lpsapi
+
+  CLIENT_LIBS:
+    -lgdi32 -lole32 code/libs/win64/libcurl.a -lcrypt32 -lmingw32
+    code/libs/win64/libSDL264main.a code/libs/win64/libSDL264.dll.a
+
+  AUTOUPDATER_LIBS:
+    -lwininet
+
+  Output:
+    ioq3ded.x86_64.exe
+    ioquake3.x86_64.exe
+    renderer_opengl1_x86_64.dll
+    renderer_opengl2_x86_64.dll
+    baseq3/cgamex86_64.dll
+    baseq3/qagamex86_64.dll
+    baseq3/uix86_64.dll
+    missionpack/cgamex86_64.dll
+    missionpack/qagamex86_64.dll
+    missionpack/uix86_64.dll
+    baseq3/vm/cgame.qvm
+    baseq3/vm/qagame.qvm
+    baseq3/vm/ui.qvm
+    missionpack/vm/cgame.qvm
+    missionpack/vm/qagame.qvm
+    missionpack/vm/ui.qvm
+    SDL264.dll
